@@ -72,6 +72,19 @@ export function setOfflineStatus(status) {
  * Seeds demo data if backend is unreachable.
  */
 export async function checkBackendHealth() {
+  const isCloudWithoutBackend =
+    typeof window !== 'undefined' &&
+    window.location.hostname !== 'localhost' &&
+    window.location.hostname !== '127.0.0.1' &&
+    (!import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_BASE_URL.includes('localhost'));
+
+  if (isCloudWithoutBackend) {
+    setOnlineStatus(false);
+    initializeLocalMirrors();
+    localAccounts.initializeDirectories();
+    return false;
+  }
+
   try {
     const res = await apiClient.get('/admin/dashboard-summary', { timeout: 2000 });
     if (res.status >= 200 && res.status < 300) {

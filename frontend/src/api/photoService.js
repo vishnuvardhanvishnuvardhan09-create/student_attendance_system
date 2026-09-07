@@ -21,6 +21,16 @@ export function resolvePhotoUrl(photoUrl) {
     return trimmed;
   }
 
+  const isCloudWithoutBackend =
+    typeof window !== 'undefined' &&
+    window.location.hostname !== 'localhost' &&
+    window.location.hostname !== '127.0.0.1' &&
+    (!import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_BASE_URL.includes('localhost'));
+
+  if (isCloudWithoutBackend) {
+    return '';
+  }
+
   const rawBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
   const serverBase = rawBase.replace(/\/api\/?$/, '');
   return `${serverBase}${trimmed.startsWith('/') ? '' : '/'}${trimmed}`;
